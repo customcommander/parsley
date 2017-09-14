@@ -1,0 +1,27 @@
+{
+  "name": "@customcommander/parsley",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "nyc --reporter=html ava -v"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/customcommander/parsley.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/customcommander/parsley/issues"
+  },
+  "homepage": "https://github.com/customcommander/parsley#readme",
+  "devDependencies": {
+    "ava": "^0.22.0",
+    "nyc": "^11.1.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  }
+}
