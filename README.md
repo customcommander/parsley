@@ -9,7 +9,7 @@ npm install @customcommander/parsley
 ```
 
 ```javascript
-const parsley = require('parsley');
+const parsley = require('@customcommander/parsley');
 
 const config = parsley({
   host: 'example.com',
