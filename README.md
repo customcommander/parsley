@@ -13,7 +13,7 @@ const parsley = require('parsley');
 
 const config = parsley({
   host: 'example.com',
-  app: 'https://${host}/app'
+  app: 'https://${host}/app',
   account: {
     username: 'john.doe@${host}',
     password: '123',
