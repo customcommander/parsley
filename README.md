@@ -10,58 +10,50 @@ npm install @customcommander/parsley
 
 ```javascript
 const parsley = require('@customcommander/parsley');
-
-const config = parsley({
-  host: 'example.com',
-  app: 'https://${host}/app',
-  account: {
-    username: 'john.doe@${host}',
-    password: '123',
-    profile: '${app}/profiles/${account.username}'
+const config = {
+  tld: 'com',
+  host: 'example.[tld]',
+  api: {
+    version: '1.0',
+    path: 'https://[host]/api/[api.version]'
   },
-  testing: {
-    host: 'dev.example.com',
-    account: {
-      username: 'test.${account.username}'
+  dev: {
+    tld: 'dev',
+    api: {
+      version: '[api.version]-alpha'
     }
   }
-});
+};
 
-config.get('app');
-// https://example.com/app
+parsley(config);
+// {
+//   tld: 'com',
+//   host: 'example.com',
+//   api: {
+//     version: '1.0',
+//     path: 'https://example.com/api/1.0'
+//   },
+//   dev: {
+//     tld: 'dev',
+//     api: {
+//       version: '1.0-alpha'
+//     }
+//   }
+// }
 
-config.merge('testing').get('app');
-// https://dev.example.com/app
-
-config.exports();
-/*
-{
-  host: 'example.com',
-  app: 'https://example.com/app',
-  account: {
-    username: 'john.doe@example.com',
-    password: '123',
-    profile: 'https://example.com/app/profiles/john.doe@example.com'
-  },
-  testing: {
-    host: 'dev.example.com',
-    account: {
-      username: 'test.john.doe@dev.example.com'
-    }
-  }
-}
-*/
-
-config.merge('testing').exports();
-/*
-{
-  host: 'dev.example.com',
-  app: 'https://dev.example.com/app',
-  account: {
-    username: 'test.john.doe@dev.example.com',
-    password: '123',
-    profile: 'https://dev.example.com/app/profiles/test.john.doe@dev.example.com'
-  }
-}
-*/
+parsley(config, 'dev');
+// {
+//   tld: 'dev',
+//   host: 'example.dev',
+//   api: {
+//     version: '1.0-alpha',
+//     path: 'https://example.dev/api/1.0-alpha'
+//   },
+//   dev: {
+//     tld: 'dev',
+//     api: {
+//       version: '1.0-alpha'
+//     }
+//   }
+// }
 ```

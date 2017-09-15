@@ -4,7 +4,7 @@
   "description": "",
   "main": "lib/index.js",
   "scripts": {
-    "test": "nyc --reporter=html ava -v"
+    "test": "make test"
   },
   "repository": {
     "type": "git",
