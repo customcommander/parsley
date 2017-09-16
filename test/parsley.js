@@ -19,27 +19,41 @@ test.beforeEach(t => {
 });
 
 test('it should not modify the original object', t => {
-  const raw = {
-    tld: 'com', 
-    host: 'example.[tld]',
-    dev: {
-      tld: 'dev'
-    }
-  };
-
-  const rawClone = {
-    tld: 'com', 
-    host: 'example.[tld]',
-    dev: {
-      tld: 'dev'
-    }
-  };
-
+  const raw = {tld: 'com', host: 'example.[tld]'};
   parsley(raw);
-  t.deepEqual(raw, rawClone);
-  
-  parsley(raw, 'dev');
-  t.deepEqual(raw, rawClone);
+  t.deepEqual(raw, {tld: 'com', host: 'example.[tld]'});
+});
+
+test('it should throw an error if a token is not found', t => {
+  t.throws(() => parsley({host: 'example.[tld]'}));
+});
+
+test('it should be able to handle complex parsing', t => {
+  let parsed = parsley({
+    val: '[a.b.c.d.e.f.g.h.i.j]',
+    xxx: 'i found you!',
+    a: {
+      b: {
+        c: {
+          d: {
+            e: {
+              f: {
+                g: {
+                  h: {
+                    i: {
+                      j: '[xxx]'
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+
+  t.is(parsed.val, 'i found you!');
 });
 
 test('it should replaces all tokens within an object', t => {
