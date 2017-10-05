@@ -1,95 +1,138 @@
 const test = require('ava');
 const parsley = require('../lib');
 
-test.beforeEach(t => {
-  t.context.raw = {
+function sample() {
+  return {
     tld: 'com',
-    host: 'example.[tld]',
+    host: 'example.[[tld]]',
     api: {
       version: '1.0',
-      path: 'https://[host]/api/[api.version]'
+      path: 'https://[[host]]/api/[[api.version]]'
     },
+    timeout: 1000,
     dev: {
       tld: 'dev',
       api: {
-        version: '[api.version]-alpha'
+        version: '[[api.version]]-alpha'
+      },
+      timeout: 2000,
+      debug: {
+        api_version: '[[dev.api.version]]'
       }
     }
   };
+}
+
+test('parsley(obj): it should return an object', t => {
+  var parsed = parsley(sample());
+  t.is(String(parsed), String({}));
 });
 
-test('it should not modify the original object', t => {
-  const raw = {tld: 'com', host: 'example.[tld]'};
+test('parsley(obj, mergeKey): it should return an object', t => {
+  var parsed = parsley(sample(), 'dev');
+  t.is(String(parsed), String({}));
+});
+
+test('parsley(obj): it should not modify `obj`', t => {
+  var raw = sample();
   parsley(raw);
-  t.deepEqual(raw, {tld: 'com', host: 'example.[tld]'});
+  t.deepEqual(raw, sample());
 });
 
-test('it should throw an error if a token is not found', t => {
-  t.throws(() => parsley({host: 'example.[tld]'}));
+test('parsley(obj, mergeKey): it should not modify `obj`', t => {
+  var raw = sample();
+  parsley(raw, 'dev');
+  t.deepEqual(raw, sample());
 });
 
-test('it should be able to handle complex parsing', t => {
-  let parsed = parsley({
-    val: '[a.b.c.d.e.f.g.h.i.j]',
-    xxx: 'i found you!',
-    a: {
-      b: {
-        c: {
-          d: {
-            e: {
-              f: {
-                g: {
-                  h: {
-                    i: {
-                      j: '[xxx]'
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  });
-
-  t.is(parsed.val, 'i found you!');
-});
-
-test('it should replaces all tokens within an object', t => {
-  const parsed = parsley(t.context.raw);
-
-  t.deepEqual(parsed, {
+test('parsley(obj): it should replace all tokens', t => {
+  t.deepEqual(parsley(sample()), {
     tld: 'com',
     host: 'example.com',
     api: {
       version: '1.0',
       path: 'https://example.com/api/1.0'
     },
+    timeout: 1000,
     dev: {
       tld: 'dev',
       api: {
         version: '1.0-alpha'
+      },
+      timeout: 2000,
+      debug: {
+        api_version: '1.0-alpha'
       }
     }
   });
 });
 
-test('you can override the base object with a key to an another object', t => {
-  const parsed = parsley(t.context.raw, 'dev');
-
-  t.deepEqual(parsed, {
+test('parsley(obj, mergeKey): it should replace all tokens', t => {
+  t.deepEqual(parsley(sample(), 'dev'), {
     tld: 'dev',
     host: 'example.dev',
     api: {
       version: '1.0-alpha',
       path: 'https://example.dev/api/1.0-alpha'
     },
+    timeout: 2000,
+    debug: {
+      api_version: '1.0-alpha'
+    },
     dev: {
       tld: 'dev',
       api: {
         version: '1.0-alpha'
+      },
+      timeout: 2000,
+      debug: {
+        api_version: '1.0-alpha'
       }
     }
   });
+});
+
+test('parsley(obj): throws an error if `obj` is not an object', t => {
+  t.throws(() => parsley([]));
+  t.throws(() => parsley(null));
+});
+
+test('parsley(obj, mergeKey): throws an error if `obj` is not an object', t => {
+  t.throws(() => parsley([], 'dev'));
+  t.throws(() => parsley(null, 'dev'));
+});
+
+test('parsley(obj, mergeKey): throws an error if `mergeKey` is not a string', t => {
+  t.throws(() => parsley(sample(), 123));
+});
+
+test('parsley(obj, mergeKey): throws an error if `mergeKey` does not point to an object', t => {
+  t.throws(() => parsley(sample(), 'host'));
+});
+
+test('parsley(obj): throws an error if a token cannot be resolved', t => {
+  t.throws(() => parsley({foo: '[[xxx]]'}));
+});
+
+test('parsley(obj, mergeKey): throws an error if a token cannot be resolved', t => {
+  t.throws(() => parsley({foo: 'foo', bar: {foo: '[[xxx]]'}}, 'bar'));
+});
+
+
+test('parsley(obj): should handle complex parsing', t => {
+  var parsed = parsley({
+    foo: '[[a.b.c.d]]',
+    a: {
+      b: {
+        c: {
+          d: '[[a.value]][[a.b.value]][[a.b.c.value]][[a.b.c.x.y.z]]',
+          'x.y.z': '!',
+          value: 'r'
+        },
+        value: 'a'
+      },
+      value: 'b'
+    }
+  });
+  t.is(parsed.foo, 'bar!');
 });

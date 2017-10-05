@@ -12,15 +12,15 @@ npm install @customcommander/parsley
 const parsley = require('@customcommander/parsley');
 const config = {
   tld: 'com',
-  host: 'example.[tld]',
+  host: 'example.[[tld]]',
   api: {
     version: '1.0',
-    path: 'https://[host]/api/[api.version]'
+    path: 'https://[[host]]/api/[[api.version]]'
   },
   dev: {
     tld: 'dev',
     api: {
-      version: '[api.version]-alpha'
+      version: '[[api.version]]-alpha'
     }
   }
 };
