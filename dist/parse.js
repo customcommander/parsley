@@ -1,4 +1,17 @@
-import {isObject, clone, find} from './object-utils';
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+exports.default = function (obj, dict) {
+    if (!(0, _objectUtils.isObject)(dict)) {
+        dict = (0, _objectUtils.clone)(obj);
+    }
+    return parse(obj, dict);
+};
+
+var _objectUtils = require('./object-utils');
 
 /**
  * Returns details about the first token found in given string or null if there are no tokens.
@@ -26,7 +39,7 @@ function getToken(str) {
 function parseString(str, dict) {
     let token;
     while (token = getToken(str)) {
-        let value = find(token.name, dict);
+        let value = (0, _objectUtils.find)(token.name, dict);
         if (typeof value === 'undefined') {
             throw new Error(`'${token.name}' not found`);
         }
@@ -37,10 +50,10 @@ function parseString(str, dict) {
 
 function parse(obj, dict) {
     return Object.keys(obj).reduce((parsed, key) => {
-        if (isObject(obj[key])) {
+        if ((0, _objectUtils.isObject)(obj[key])) {
             parsed[key] = parse(obj[key], dict);
         } else if (typeof obj[key] === 'string') {
-            parsed[key] = parseString(obj[key], dict)
+            parsed[key] = parseString(obj[key], dict);
         } else {
             parsed[key] = obj[key];
         }
@@ -48,9 +61,4 @@ function parse(obj, dict) {
     }, {});
 }
 
-export default function (obj, dict) {
-    if (!isObject(dict)) {
-        dict = clone(obj);
-    }
-    return parse(obj, dict);
-};
+;

@@ -1,9 +1,18 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.isObject = isObject;
+exports.find = find;
+exports.clone = clone;
+exports.merge = merge;
 /**
  * Is the `thing` an object literal?
  * @param {any} thing
  * @return {boolean}
  */
-export function isObject(thing) {
+function isObject(thing) {
     return String(thing) === '[object Object]';
 };
 
@@ -12,11 +21,12 @@ export function isObject(thing) {
  * @param {string} key 
  * @param {object} obj 
  */
-export function find(key, obj) {
+function find(key, obj) {
     if (isObject(obj) && obj.hasOwnProperty(key)) {
         return obj[key];
     }
-    if (key.includes('.')) { // e.g. 'a.b.c'
+    if (key.includes('.')) {
+        // e.g. 'a.b.c'
         key = key.split('.');
         let top = key[0]; // e.g. 'a'
         let sub = key.slice(1).join('.'); // e.g. 'b.c'
@@ -29,7 +39,7 @@ export function find(key, obj) {
  * @param {object} obj
  * @return {object}
  */
-export function clone(obj) {
+function clone(obj) {
     return Object.keys(obj).reduce((cloned, key) => {
         if (isObject(obj[key])) {
             cloned[key] = clone(obj[key]);
@@ -46,7 +56,7 @@ export function clone(obj) {
  * @param {object} b
  * @return {object}
  */
-export function merge(a, b) {
+function merge(a, b) {
     return Object.keys(b).reduce((merged, key) => {
         if (isObject(a[key]) && isObject(b[key])) {
             merged[key] = merge(a[key], b[key]);

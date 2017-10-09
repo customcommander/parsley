@@ -1,5 +1,5 @@
-const test = require('ava');
-const parsley = require('../lib');
+import test from 'ava';
+import parsley from '../lib';
 
 function sample() {
   return {
